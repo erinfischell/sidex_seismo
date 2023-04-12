@@ -7,7 +7,6 @@
 # Senior Scientist
 # JPAnalytics
 #
-#
 # This work was supported by the US Office of Naval Research
 #
 # questions? contact: efischell@gmail.com
@@ -29,8 +28,7 @@ from datetime import datetime
 # For example, running this (by clicking run or pressing Shift+Enter) will list all files under the input directory
 
 import os
-hydrophone_metadata='/kaggle/input/sidexmetadata/SIDEx_hydrophones_surveyed.csv'
-geophone_metadata = '/kaggle/input/sidexmetadata/SIDEx_geophones_surveyed.csv'
+
 
 def timefromfilename(filename):
     # get timestamp from filename
@@ -91,25 +89,26 @@ def get_moving_avg(df,time_movingavg):
     FS=1000 # sample rate (samples/s)
     return df.rolling(int(time_movingavg*FS)).mean()
 
-def plot_specgram(data,data_type,metafile=None,outfile = None):
+def plot_specgram(data,data_type,metadir,outfile = None):
     
-    if metafile is None:
-        if data_type=='h':
+
+    if data_type=='h':
             
-            # filter:
-            metafile=  hydrophone_metadata
-            data_filt = hydrophone_filter_df(data)
-            num_rows=5
-            num_cols=3
-            vmin=-100
-            vmax=-30
-        elif data_type=='g':
-            metafile= geophone_metadata
-            data_filt = geophone_filter_df(data)
-            num_rows= 4
-            num_cols=3
-            vmin=-150
-            vmax=-80
+        # filter:
+        metafile=  metadir + 'SIDEx_hydrophones_surveyed.csv'
+
+        data_filt = hydrophone_filter_df(data)
+        num_rows=5
+        num_cols=3
+        vmin=-100
+        vmax=-30
+    elif data_type=='g':
+        metafile= metadir + '/SIDEx_geophones_surveyed.csv'#hydrophone_metadata
+        data_filt = geophone_filter_df(data)
+        num_rows= 4
+        num_cols=3
+        vmin=-150
+        vmax=-80
     # plot!
     print('Plotting spectrogram!')
     metadata = pd.read_csv(metafile)
@@ -175,7 +174,7 @@ def plot_geophone_particlemotion(data_select,outfile=None):
     if outfile is not None:
         plt.savefig(outfile)
     
-def plot_timeseries(data,data_type,ax=None,outfile = None):
+def plot_timeseries(data,data_type,metadir,ax=None,outfile = None):
     # data: pandas dataframe containing data
     # data_type = h or g
     # ax: if you want the plot as an axis in existing plot
@@ -183,12 +182,11 @@ def plot_timeseries(data,data_type,ax=None,outfile = None):
     print('Plotting time series!')
     
     if data_type=='h':
-        metafile = hydrophone_metadata
-        #SIDEx_hydrophones_surveyed.csv'
+        metafile = metadir + 'SIDEx_hydrophones_surveyed.csv'
         # filter:
         data_filt = hydrophone_filter_df(data)
     elif data_type=='g':
-        metafile = geophone_metadata
+        metafile = metadir + 'SIDEx_geophones_surveyed.csv'
         data_filt = geophone_filter_df(data)
 
     #print(data_filt.columns)
@@ -242,12 +240,12 @@ def plot_timeseries(data,data_type,ax=None,outfile = None):
     # save file, and show if desired:
     if outfile is not None:
         plt.savefig(outfile)
-def plot_rel_locations(ax=None,outfile=None):
+def plot_rel_locations(metadir,ax=None,outfile=None):
     print('plotting array')
     if ax is None:
         fig,ax=plt.subplots(1,1)
-    loc_data_h=pd.read_csv(hydrophone_metadata)
-    loc_data_g=pd.read_csv(geophone_metadata)
+    loc_data_h=pd.read_csv(metadir + 'SIDEx_hydrophones_surveyed.csv')
+    loc_data_g=pd.read_csv(metadir + 'SIDEx_geophones_surveyed.csv')
     ax.plot(loc_data_h['Easting'],loc_data_h['Northing'],'o')
     ax.plot(loc_data_g['Easting'],loc_data_g['Northing'],'kx')
     
@@ -260,12 +258,12 @@ def plot_rel_locations(ax=None,outfile=None):
         plt.savefig(outfile)
     
     
-def plot_GPS_v_time(ax=None,outfile=None):
+def plot_GPS_v_time(metadir,ax=None,outfile=None):
     if ax is None:
         fig,ax=plt.subplots(1,1)
     # plot the GPS drift v. time for the entire time series
     print('plotting gps drift')
-    GPS_files = sorted(glob.glob('/kaggle/input/sidexmetadata/GPS*.csv'))
+    GPS_files = sorted(glob.glob(metadir + '*/GPS*.csv'))
     # create scatter plot of GPS location v. time:
     ii=0
 
