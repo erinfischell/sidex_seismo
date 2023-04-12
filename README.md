@@ -14,9 +14,13 @@ Data Use Notes: Data is public and available for use with attribution.
 
 ____________________________________________________________________
 Code organization:
-src/ contains python scripts
-"*_utils.py" files have utilities
 
+* src/ contains python scripts
+
+* "*_utils.py" files have utilities
+
+* Future versions will include event detection and localization code
+____________________________________________________________________
 
 Information for SIDEx seismo-acoustic cabled array data set
 
